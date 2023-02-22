@@ -1,0 +1,55 @@
+============================ sbrtkdef.txt ===================================
+This file defines the columns of data in the sbrtk.log files produced by the
+GRID software receiver. Each sbrtk.log file contains time-stamped precise
+position solutions that represent the receiver's best estimate of the
+antenna's L1 phase center in ECEF coordinates. ORT time stamps indicate the
+time at which the position solution applies. See channeldef.txt for a
+definition of ORT.
+=============================================================================
+
+
+Column        Quantity
+
+1 ----------- ORT week number. 
+
+2 ----------- ORT whole seconds of week.
+
+3 ----------- ORT fractional second. 
+
+4,5,6 ------- X,Y,Z receiver antenna L1 phase center position expressed in
+              meters the ECEF reference frame.
+
+7-12 -------- Upper-triangular elements of the formal error covariance matrix
+              P associated with the X, Y, and Z coordinates, in units of
+              meters^2, in the following order: P11, P12, P13, P22, P23, P33.
+              Note that the values in P are a lower bound on the actual error
+              covariance, as they are output under the assumption that any
+              fixed solution that has passed the integer validation test is
+              based on the correct integer solution, whereas this is not
+              always the case.
+
+13 ---------- The integer ambiguity validation test statistic.  A large
+              statistic (e.g., above 20) indicates a confident solution.
+              Bounds on the probability of incorrect fix can be determined
+              from this statistic and from the satellite geometry and number
+              of participating satellites.  The test statistic by default is
+              produced by application of the difference test described in
+              Wang, Lei, and Sandra Verhagen. "A new ambiguity acceptance test
+              threshold determination method with controllable failure rate."
+              Journal of Geodesy 89.4 (2015): 361-375.
+ 
+14 ---------- The number of double-difference measurements that participated
+              in the solution at the current epoch. 
+
+15 ---------- A flag indicating whether the integer-constrained solution
+              passed the integer ambiguity validation test for the
+              user-configured false fixing rate.
+
+16 ---------- A flag indicating whether the X, Y, and Z coordinates correspond
+              to an integer-fixed (1) or float (0) solution.
+
+17 ---------- The age of reference data, in seconds.  If this is larger than 5
+              seconds or so, signicant errors can arise when extrapolating the
+              reference data to the current epoch.
+
+=============================================================================

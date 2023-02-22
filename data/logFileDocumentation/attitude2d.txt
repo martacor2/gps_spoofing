@@ -1,0 +1,38 @@
+============================ attitude2d.txt ==================================
+This file defines the columns of data in attitude2.log files. Each line of
+each attitude2d.log file contains a precise two-dimensional attitude solution
+for a constrained-length two-antenna baseline. See channeldef.txt for a
+definition of ORT; note that ORT is close enough to true GPS time for the
+difference to be ignored in many use cases of these attitude solutions.
+=============================================================================
+
+
+Column        Quantity
+
+1 ----------- ORT week number.
+
+2 ----------- ORT whole seconds of week.
+
+3 ----------- ORT fractional second.
+
+4 ----------- Azimuth angle in degrees
+
+5 ----------- Azimuth angle 1-sigma uncertainty in degrees
+
+6 ----------- Elevation angle in degrees
+
+7 ----------- Elevation angle 1-sigma uncertainty in degrees
+
+8,9,10 ------ X,Y,Z baseline vector between the two antennas expressed in 
+              meters in the ECEF reference frame.
+
+11 ---------- Number of double-differenced measurements contribution to this 
+              solution
+
+12 ---------- Ratio of second-best to best integer solution cost
+
+13 ---------- 1 if integrity check is passed; 0 if solution is unreliable
+
+14 ---------- 1 is solution is integer-fixed; 0 if solution is float
+
+=============================================================================
