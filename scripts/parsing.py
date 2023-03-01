@@ -100,6 +100,9 @@ def channel_parse(inputfilename):
     df = pd.DataFrame(data.T, columns = colmn_names)
     df = df.astype(typ)
 
+    #need to take out invalid offset receiver time
+    df = df[df['ORTweek']<9999].reset_index(drop=True)
+
     data_set = inputfilename.split('/')[1]
     fig = plt.figure(dpi = 500, figsize =[10 ,7])
     for prn in df['TXID'].unique():
@@ -111,6 +114,41 @@ def channel_parse(inputfilename):
     plt.xlabel('RRT time (seconds)')
     plt.ylabel('$C/N_0$ (dB-Hz)')
     fig.savefig('figures/'+data_set+'/CN0.png')
+
+    fig = plt.figure(dpi = 500, figsize =[10 ,7])
+    for prn in df['TXID'].unique():
+        if prn<=32:
+            plt.plot(df[df['TXID'] == prn]['RRTseconds'],df[df['TXID'] == prn]['Pseudo_m'], label = f'PRN:{prn}')
+    plt.legend()
+    plt.grid()
+    plt.xlim(0)
+    plt.xlabel('RRT time (seconds)')
+    plt.ylabel('Pseudorange (m)')
+    fig.savefig('figures/'+data_set+'/rho_m.png')
+
+    fig = plt.figure(dpi = 500, figsize =[10 ,7])
+    for prn in df['TXID'].unique():
+        if prn<=32:
+            plt.plot(df[df['TXID'] == prn]['RRTseconds'],df[df['TXID'] == prn]['Doppler_f'], label = f'PRN:{prn}')
+    plt.legend()
+    plt.grid()
+    plt.xlim(0)
+    plt.xlabel('RRT time (seconds)')
+    plt.ylabel('Doppler Frequency (Hz)')
+    fig.savefig('figures/'+data_set+'/dopp_f.png')
+
+    fig = plt.figure(dpi = 500, figsize =[10 ,7])
+    for prn in df['TXID'].unique():
+        if prn<=32:
+            plt.plot(df[df['TXID'] == prn]['RRTseconds'],df[df['TXID'] == prn]['Beat_carrier_phi'], label = f'PRN:{prn}')
+    plt.legend()
+    plt.grid()
+    plt.xlim(0)
+    plt.xlabel('RRT time (seconds)')
+    plt.ylabel('Carrier Phase (cycles)')
+    fig.savefig('figures/'+data_set+'/phi_cycles.png')
+
+    
     return df
 
 def navsol_parse(inputfilename):
