@@ -100,10 +100,18 @@ def channel_parse(inputfilename):
     df = pd.DataFrame(data.T, columns = colmn_names)
     df = df.astype(typ)
 
+    data_set = inputfilename.split('/')[1]
+
+    if data_set == 'ds2':
+        df = df[df['RRTseconds']>=2.99691752].reset_index(drop=True)
+        df['RRTseconds'] = df['RRTseconds']-df['RRTseconds'][0]
+    if data_set == 'ds3':
+        df = df[df['RRTseconds']>=2.20332084].reset_index(drop=True)
+        df['RRTseconds'] = df['RRTseconds']-df['RRTseconds'][0]
+
     #need to take out invalid offset receiver time
     df = df[df['ORTweek']<9999].reset_index(drop=True)
 
-    data_set = inputfilename.split('/')[1]
     fig = plt.figure(dpi = 500, figsize =[10 ,7])
     for prn in df['TXID'].unique():
         if prn<=32:
@@ -362,6 +370,6 @@ if __name__ == '__main__':
 # plt.xlim(0)
 # plt.grid()
 # plt.xlabel('RRT time (seconds)')
-# plt.ylabel('$Power$ (dB)')
+# plt.ylabel('Normalized Power (dB)')
 # plt.legend()
 # fig.savefig('figures/comparison/power.png')
