@@ -5,7 +5,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-def power_parse(inputfilename):
+def power_parse(inputfilename, norm = True):
     """ Function to parse the power data
     Args:
         inputfilename (string): path to mat file
@@ -29,12 +29,13 @@ def power_parse(inputfilename):
 
     if data_set == 'ds2':
         df = df[df['time']>=2.99691752].reset_index(drop=True)
-        df['time'] = df['time']-df['time'][0]
+        df['time'] = df['time']+df['time'][0]
     if data_set == 'ds3':
         df = df[df['time']>=2.20332084].reset_index(drop=True)
-        df['time'] = df['time']-df['time'][0]
+        df['time'] = df['time']+df['time'][0]
 
-    df['power'] = df['power']-df['power'][0]
+    if norm:
+        df['power'] = df['power']-np.average(df['power'][0:10])
 
     fig = plt.figure(dpi = 500, figsize =[10 ,7])
     plt.plot(df['time'],df['power'])
@@ -104,10 +105,10 @@ def channel_parse(inputfilename):
 
     if data_set == 'ds2':
         df = df[df['RRTseconds']>=2.99691752].reset_index(drop=True)
-        df['RRTseconds'] = df['RRTseconds']-df['RRTseconds'][0]
+        df['RRTseconds'] = df['RRTseconds']+df['RRTseconds'][0]
     if data_set == 'ds3':
         df = df[df['RRTseconds']>=2.20332084].reset_index(drop=True)
-        df['RRTseconds'] = df['RRTseconds']-df['RRTseconds'][0]
+        df['RRTseconds'] = df['RRTseconds']+df['RRTseconds'][0]
 
     #need to take out invalid offset receiver time
     df = df[df['ORTweek']<9999].reset_index(drop=True)
@@ -356,20 +357,3 @@ def main():
 if __name__ == '__main__':
 
     main()
-
-# clean_power2MHz_df = power_parse('data/cleanStatic/cd1power2MHz.mat')
-# ds2_power2MHz_df = power_parse('data/ds2/tb2power2MHz.mat')
-# ds3_power2MHz_df = power_parse('data/ds3/tb3power2MHz.mat')
-# ds7_power2MHz_df = power_parse('data/ds7/tb7power2MHz.mat')
-
-# fig = plt.figure(dpi = 500, figsize =[10 ,7])
-# plt.plot(clean_power2MHz_df['time'],clean_power2MHz_df['power'], label = 'clean')
-# plt.plot(ds2_power2MHz_df['time'],ds2_power2MHz_df['power'], label = 'ds2')
-# plt.plot(ds3_power2MHz_df['time'],ds3_power2MHz_df['power'], label = 'ds3')
-# plt.plot(ds7_power2MHz_df['time'],ds7_power2MHz_df['power'], label = 'ds7')
-# plt.xlim(0)
-# plt.grid()
-# plt.xlabel('RRT time (seconds)')
-# plt.ylabel('Normalized Power (dB)')
-# plt.legend()
-# fig.savefig('figures/comparison/power.png')
