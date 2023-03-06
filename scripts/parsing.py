@@ -346,8 +346,8 @@ def main():
 
     # The overall power of the clean static scenario was also found to be 8.6 dB 
     # higher than the pre-spoofing part of the spoofed scenarios. 
-    # An amplitude correc- tion factor was found empirically to be 0.373. 
-    # Multi- plication of the clean static scenario by this factor will scale the 
+    # An amplitude correction factor was found empirically to be 0.373. 
+    # Multiplication of the clean static scenario by this factor will scale the 
     # raw signal and noise power in the sampled data to match that recorded in the spoofing scenario files. 
     # Scenarios seven, eight, and the clean static sce- nario should be multiplied by this correction factor 
     # to eliminate the increased signal and noise power relative to Scenarios 1-4.
