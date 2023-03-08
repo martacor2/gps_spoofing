@@ -230,6 +230,15 @@ def iq_parse(inputfilename):
     df = pd.DataFrame(data.T, columns = colmn_names)
     df = df.astype(typ)
 
+    # if data == 'ds2':
+    #     df = df[df['RRTseconds']>=2.99691752].reset_index(drop=True)
+    #     df['RRTseconds'] = df['RRTseconds']+df['RRTseconds'][0]
+    # if data == 'ds3':
+    #     df = df[df['time']>=2.20332084].reset_index(drop=True)
+    #     df['time'] = df['time']+df['time'][0]
+
+    data_set = inputfilename.split('/')[1]
+
     return df
 
 def iq_taps_parse(inputfilename):
@@ -264,6 +273,24 @@ def iq_taps_parse(inputfilename):
     # typ = dict(zip(colmn_names, type_specs))
 
     df = pd.DataFrame(data.T, columns = colmn_names)
+    data_set = inputfilename.split('/')[1]
+
+    fig = plt.figure()#dpi = 500, figsize =[10 ,7])
+    ax = fig.add_subplot(projection='3d')
+    for prn in df['TXID'].unique():
+        if prn==23:
+            ax.scatter(df[df['TXID'] == prn]['RRTseconds'],np.ones(len(df[df['TXID'] == prn]['RRTseconds']))*0,df[df['TXID'] == prn]['phase_tap_0'], label = f'PRN:{prn}')
+            ax.scatter(df[df['TXID'] == prn]['RRTseconds'],np.ones(len(df[df['TXID'] == prn]['RRTseconds']))*1,df[df['TXID'] == prn]['phase_tap_1'], label = f'PRN:{prn}')
+            ax.scatter(df[df['TXID'] == prn]['RRTseconds'],np.ones(len(df[df['TXID'] == prn]['RRTseconds']))*2,df[df['TXID'] == prn]['phase_tap_2'], label = f'PRN:{prn}')
+    plt.legend()
+    plt.grid()
+    plt.xlim(0)
+    plt.xlabel('RRT time (seconds)')
+    plt.ylabel('$C/N_0$ (dB-Hz)')
+    plt.show()
+    # fig.savefig('figures/'+data_set+'/taps.png')
+
+    print(df)
 
     # df = df.astype(typ)
 
@@ -329,17 +356,17 @@ def main():
         # elif f.split('/')[-1] == 'iq.mat':
         #     iq_df = iq_parse(f)
 
-        # elif f.split('/')[-1] == 'iqtaps.mat':
-        #     iq_taps_df = iq_taps_parse(f)
+        elif f.split('/')[-1] == 'iqtaps.mat':
+            iq_taps_df = iq_taps_parse(f)
 
-        elif f.split('/')[-1][-len('power2MHz.mat'):] == 'power2MHz.mat':
-            power2MHz_df = power_parse(f)
+        # elif f.split('/')[-1][-len('power2MHz.mat'):] == 'power2MHz.mat':
+        #     power2MHz_df = power_parse(f)
 
-        elif f.split('/')[-1][-len('power4MHz.mat'):] == 'power4MHz.mat':
-            power4MHz_df = power_parse(f)
+        # elif f.split('/')[-1][-len('power4MHz.mat'):] == 'power4MHz.mat':
+        #     power4MHz_df = power_parse(f)
 
-        elif f.split('/')[-1][-len('power8MHz.mat'):] == 'power8MHz.mat':
-            power8MHz_df = power_parse(f)
+        # elif f.split('/')[-1][-len('power8MHz.mat'):] == 'power8MHz.mat':
+        #     power8MHz_df = power_parse(f)
 
         else:
             print(f'Cannot parse {f}')

@@ -15,33 +15,47 @@ def clean_dat_PL(df_power):
     var = np.sum([(df_power['power'].iloc[i]-u)**2 for i in range(len(df_power['power']))])/(len(df_power['power']))
     return u,var
 
-def spoofed_mean(df_power):
-    u = np.average(df_power['power'][0:400])
-    return u
+def spoofed_PL(df_power, initial_t=0):
+    t = 0; count = 1;
+    moving_m = 0; moving_variance = 0;
 
-def simple_H_test(df_power_test, v_t):
+    while df_power['time'].iloc[t]<= 60 + initial_t:
+        moving_variance = ((count-1)/(count)) * (moving_variance+ ((moving_m-df_power['power'].iloc[t])**2/(count)))
+        moving_m += (1/count)*(df_power['power'].iloc[t] - moving_m)
+        t+=1
+        count+=1
+
+    return [moving_m, moving_variance]
+
+
+def simple_H_test(df_power_test, mean, variance, m):
 
     h_val = np.zeros(len(df_power_test['time']))
 
     for i in range(len(h_val)):
-        if np.abs(df_power_test['power'].iloc[i]) > v_t:
+        if np.abs(df_power_test['power'].iloc[i]) > mean + m*np.sqrt(variance) or np.abs(df_power_test['power'].iloc[i]) < mean - m*np.sqrt(variance):
             h_val[i] = 1
 
     return h_val
 
 
-def power_check_plots(clean_df, spoofed_df, mean, variance, plot_name):
+def power_check(clean_df, spoofed_df, parameters, plot_name, m=5, count=0):
 
-    spoofed_h_test = simple_H_test(spoofed_df, mean + 4*np.sqrt(variance))
+    #data gathered thus far
+    mean = parameters[0]
+    variance = parameters[1]
+
+    spoofed_h_test = simple_H_test(spoofed_df, mean, variance, m)
+
     first_one = spoofed_df['time'].iloc[np.argmax(spoofed_h_test)]
     print(f'First detection at {first_one}')
 
     fig = plt.figure(dpi = 500, figsize =[10 ,4.5])
-    plt.plot(clean_df['time'], clean_df['power']- clean_df['power'][0] , label = 'clean', color = 'grey')
-    plt.plot(spoofed_df['time'], spoofed_df['power'] - spoofed_df['power'][0] , label = 'spoofed', color = 'k')
+    plt.plot(clean_df['time'], clean_df['power']- clean_df['power'].iloc[0] , label = 'clean', color = 'grey')
+    plt.plot(spoofed_df['time'], spoofed_df['power'] - spoofed_df['power'].iloc[0] , label = 'spoofed', color = 'k')
 
-    plt.plot(clean_df['time'], np.zeros(len(clean_df['time']))*mean + 4*np.sqrt(variance), '--', color = 'tab:red', label = '$\pm 4\sigma$')
-    plt.plot(clean_df['time'], np.zeros(len(clean_df['time']))*mean - 4*np.sqrt(variance), '--', color = 'tab:red')
+    plt.plot(spoofed_df['time'], np.zeros(len(spoofed_df['time']))*mean + m*np.sqrt(variance), '--', color = 'tab:red', label = f'$\pm {m}\sigma$')
+    plt.plot(spoofed_df['time'], np.zeros(len(spoofed_df['time']))*mean - m*np.sqrt(variance), '--', color = 'tab:red')
 
     plt.xlim(0,500)
     # plt.ylim(-0.3,0.2)
@@ -54,8 +68,8 @@ def power_check_plots(clean_df, spoofed_df, mean, variance, plot_name):
     fig, axs = plt.subplots(2, 1)
 
     axs[0].plot(spoofed_df['time'], spoofed_df['power'] , label = 'ds7', color = 'k')
-    axs[0].plot(clean_df['time'], np.ones(len(clean_df['time']))*mean + 4*np.sqrt(variance), '--', color = 'tab:red', label = '$\pm 4\sigma$')
-    axs[0].plot(clean_df['time'], np.ones(len(clean_df['time']))*mean - 4*np.sqrt(variance), '--', color = 'tab:red')
+    axs[0].plot(spoofed_df['time'], np.ones(len(spoofed_df['time']))*mean + m*np.sqrt(variance), '--', color = 'tab:red', label = f'$\pm {m}\sigma$')
+    axs[0].plot(spoofed_df['time'], np.ones(len(spoofed_df['time']))*mean - m*np.sqrt(variance), '--', color = 'tab:red')
     axs[0].set_xlim(0,500)
     axs[0].grid()
     axs[0].set_ylabel('P (dB)')
@@ -73,15 +87,23 @@ def power_check_plots(clean_df, spoofed_df, mean, variance, plot_name):
     fig.savefig('figures/comparison/'+plot_name+'_h_test.png')
 
 
-clean_mean, clean_variance = clean_dat_PL(clean_power2MHz_df)
+# clean_mean, clean_variance = clean_dat_PL(clean_power2MHz_df)
 from statistics import NormalDist
-prob = 2*(NormalDist(mu =clean_mean, sigma = np.sqrt(clean_variance)).cdf(clean_mean+4*(np.sqrt(clean_variance))) - 0.5)
+prob = 2*(NormalDist(mu =0, sigma = np.sqrt(1)).cdf(0+5*(np.sqrt(1))) - 0.5)
+
 print(f'Interval of confidence  = {prob}')
 print(f'Probability of false detection  = {1-prob}') #not the same as false positive rate
 
 
-power_check_plots(clean_power2MHz_df, ds7_power2MHz_df, clean_mean, clean_variance, 'clean_vs_ds7')
-power_check_plots(clean_power2MHz_df, ds2_power2MHz_df, spoofed_mean(ds2_power2MHz_df), clean_variance, 'clean_vs_ds2')
-power_check_plots(clean_power2MHz_df, ds3_power2MHz_df, spoofed_mean(ds3_power2MHz_df), clean_variance, 'clean_vs_ds3')
+print(spoofed_PL(ds2_power2MHz_df))
+print(spoofed_PL(ds3_power2MHz_df))
+print(spoofed_PL(ds7_power2MHz_df))
+
+power_check(clean_power2MHz_df, ds7_power2MHz_df, spoofed_PL(ds7_power2MHz_df), 'clean_vs_ds7')
+power_check(clean_power2MHz_df, ds2_power2MHz_df, spoofed_PL(ds2_power2MHz_df), 'clean_vs_ds2')
+power_check(clean_power2MHz_df, ds3_power2MHz_df, spoofed_PL(ds3_power2MHz_df), 'clean_vs_ds3')
 
 # power_check_plots(clean_power2MHz_df, ds7_power2MHz_df, clean_mean, clean_variance, 'clean_vs_ds7')
+
+# get the mean and the variance from the first minute of each data set
+#learn the average and variance assuming unspoofed
