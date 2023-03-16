@@ -1,2 +1,1 @@
-# gps_spoofing
-AA 272 Final Project
+# AA 272 Final Project - GPS Spoofing Detection Study
