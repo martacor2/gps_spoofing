@@ -28,11 +28,9 @@ def power_parse(inputfilename, norm = True):
     power_type = inputfilename.split('/')[-1][0:9]
 
     if data_set == 'ds2':
-        df = df[df['time']>=2.99691752].reset_index(drop=True)
-        df['time'] = df['time']+df['time'][0]
+        df['time'] = df['time']+2.99691752
     if data_set == 'ds3':
-        df = df[df['time']>=2.20332084].reset_index(drop=True)
-        df['time'] = df['time']+df['time'][0]
+        df['time'] = df['time']+2.20332084
 
     if norm:
         df['power'] = df['power']-np.average(df['power'][0:10])
@@ -359,8 +357,8 @@ def main():
         elif f.split('/')[-1] == 'iqtaps.mat':
             iq_taps_df = iq_taps_parse(f)
 
-        # elif f.split('/')[-1][-len('power2MHz.mat'):] == 'power2MHz.mat':
-        #     power2MHz_df = power_parse(f)
+        elif f.split('/')[-1][-len('power2MHz.mat'):] == 'power2MHz.mat':
+            power2MHz_df = power_parse(f)
 
         # elif f.split('/')[-1][-len('power4MHz.mat'):] == 'power4MHz.mat':
         #     power4MHz_df = power_parse(f)

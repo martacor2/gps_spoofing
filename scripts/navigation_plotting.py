@@ -11,7 +11,7 @@ def navplot(clean_df,spoofed_df, plot_name):
     clean_x_mean = np.mean(clean_df['x_recv'][0:100])
     clean_y_mean = np.mean(clean_df['y_recv'][0:100])
     clean_z_mean = np.mean(clean_df['z_recv'][0:100])
-    clean_b_mean = np.mean(clean_df['deltR'])
+    clean_b_mean = np.mean(clean_df['deltRdot'])
 
     # spoofed_x_mean = np.mean(spoofed_df['x_recv'])
     # spoofed_y_mean = np.mean(spoofed_df['y_recv'])
@@ -52,8 +52,8 @@ def navplot(clean_df,spoofed_df, plot_name):
 
 
     fig = plt.figure(dpi = 500, figsize =[10 ,4.5])
-    plt.plot(clean_time, clean_df['deltR']-clean_b_mean, label = 'clean', color = 'grey')
-    # plt.plot(spoofed_time, spoofed_df['deltR']-clean_b_mean, label = 'spoofed', color = 'k')
+    plt.plot(clean_time, clean_df['deltRdot']-clean_b_mean, label = 'clean', color = 'grey')
+    plt.plot(spoofed_time, spoofed_df['deltRdot']-clean_b_mean, label = 'spoofed', color = 'k')
     plt.xlim(spoofed_time[0])
     # plt.ylim(-10,10)
     plt.grid()
